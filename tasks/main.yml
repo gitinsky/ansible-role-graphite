@@ -1,0 +1,42 @@
+# python-virtualenv
+
+- name: install dependencies
+  apt: name={{ item }}
+  with_items:
+    - python-pip
+    - python-dev
+    - libffi-dev
+    - gunicorn
+
+- name: setup Django
+  pip: name=Django version=1.4.10 state=present
+
+- name: setup django-tagging
+  pip: name=django-tagging state=present version='0.3.6'
+
+- name: install required pips
+  pip: name={{ item }}
+  with_items:
+    - graphite-api
+    - cyanite
+    - graphite-web
+
+- name: configure graphite-api
+  template: src=graphite-api.yaml dest=/etc/graphite-api.yaml
+
+- name: configure graphite-web
+  template: src=local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py
+
+- name: syncdb
+  shell: python ./manage.py syncdb --noinput chdir=/opt/graphite/webapp/graphite
+
+- name: put gunicorn service descriptor
+  template: src=gunicorn-eye.rb dest=/etc/eye/gunicorn.rb owner=root group=root mode=0644
+  notify:
+      - reload eye configs
+
+- name: load config in eye
+  command: bash -c "source /usr/local/rvm/scripts/rvm && eye l /etc/eye/apps.eye"
+
+
+# If you run Cyanite on multiple hosts, specify all of them to load-balance traffic
