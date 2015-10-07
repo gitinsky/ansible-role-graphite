@@ -4,3 +4,21 @@ finders:
 cyanite:
   urls:
     - http://127.0.0.1:8080
+logging:
+  version: 1
+  disable_existing_loggers: true
+  handlers:
+    file:
+      class: logging.FileHandler
+      filename: /var/log/graphite-api.log
+  loggers:
+    graphite_api:
+      handlers:
+        - file
+      propagate: true
+      level: DEBUG
+    root:
+      handlers:
+        - file
+      propagate: true
+      level: DEBUG
