@@ -14,7 +14,20 @@
   pip: name={{ item }}
   with_items:
     - graphite-api
-    - cyanite
+    # - cyanite
+
+# install latest version of graphite-cyanite as the one in pip is still broken, see
+# https://github.com/brutasse/graphite-cyanite/issues/14
+# https://github.com/pyr/cyanite/issues/119
+# https://github.com/brutasse/graphite-api/issues/123
+
+- name: install graphite-cyanite
+  pip: name=git+https://github.com/gitinsky/graphite-cyanite#egg=cyanite
+  tags: pip
+
+# - name: install graphite-cyanite
+#   pip: name=git+https://github.com/brutasse/graphite-cyanite.git#egg=cyanite
+#   tags: pip
 
 - name: configure graphite-api
   template: src=graphite-api.yaml dest=/etc/graphite-api.yaml
