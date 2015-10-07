@@ -23,7 +23,7 @@
   file: dest={{ item.dst }} state={{ item.state }}
   with_items:
       - { dst: /srv/graphite, state: directory }
-      - { dst: /srv/graphite/index, state: file }
+      - { dst: /srv/graphite/index, state: touch }
 
  
 - name: put gunicorn service descriptor

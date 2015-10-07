@@ -1,5 +1,5 @@
 - name: setup carbon
-  pip: name=carbon state=present
+  pip: name=carbon state=present version=0.9.12
 
 - name: create /opt/graphite/conf/
   file: dest=/opt/graphite/conf/ state=directory
