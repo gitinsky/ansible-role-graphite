@@ -1,2 +1,1 @@
-python ./manage.py syncdb --noinput
-gunicorn_django --bind=0.0.0.0:8081
+Currently working on graphite/api, graphite/carbon and graphite/web seem to be broken.
