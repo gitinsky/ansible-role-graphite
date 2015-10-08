@@ -1,0 +1,5 @@
+---
+- name: eye restart graphite-api
+  command: bash -c "source /usr/local/rvm/scripts/rvm && eye restart graphite-api"
+  sudo: yes
+  sudo_user: "{{ eye_user }}"

@@ -1,5 +1,6 @@
-graphite_retention_config_name: default
-graphite_retention_setting:     10s:2d,60s:14d,300s:60d,1200s:395d
-graphite_secret_key:            key
-graphite_admin_password:        password
-graphite_http_port:             8001
+graphite_api_http_port: 8001
+graphite_api_port: 8888
+graphite_api_bind_ip: 0.0.0.0
+cyanite_hosts_group: cyanite_hosts
+default_cyanite_api_port: 8080
+default_cyanite_if: eth0

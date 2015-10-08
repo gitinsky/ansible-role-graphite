@@ -31,6 +31,9 @@
 
 - name: configure graphite-api
   template: src=graphite-api.yaml dest=/etc/graphite-api.yaml
+  notify:
+      - eye restart graphite-api
+  tags: gapiconf
 
 - name: create graphite index
   file: dest={{ item.dst }} state={{ item.state }}
@@ -43,6 +46,7 @@
   template: src=graphite-api.rb dest=/etc/eye/graphite-api.rb owner=root group=root mode=0644
   notify:
       - reload eye configs
+      - eye restart graphite-api
 
 - name: load config in eye
   command: bash -c "source /usr/local/rvm/scripts/rvm && eye l /etc/eye/apps.eye"

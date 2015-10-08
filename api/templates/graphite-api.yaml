@@ -3,7 +3,17 @@ finders:
   - cyanite.CyaniteFinder
 cyanite:
   urls:
-    - http://127.0.0.1:8080
+{% for host in groups[cyanite_hosts_group] %}
+{% set j_proto = 'https' if hostvars[host].cyanite_https is defined and hostvars[host].cyanite_https else 'http' %}
+{% set j_port = hostvars[host].cyanite_api_port|default(default_cyanite_api_port) %}
+{% if hostvars[host]['cyanite_access_by_inventory_hostname_not_ip'] is defined and hostvars[host]['cyanite_access_by_inventory_hostname_not_ip'] %}
+{% set j_addr = hostvars[host]['inventory_hostname'] %}
+{% else %}
+{% set j_if = hostvars[host].cyanite_if|default(default_cyanite_if) %}
+{% set j_addr = hostvars[host]['ansible_' + j_if]['ipv4']['address']|default('127.0.0.1') %}
+{% endif %}
+  - {{ j_proto }}://{{ j_addr }}:{{ j_port }}
+{% endfor %}
 logging:
   version: 1
   disable_existing_loggers: true
