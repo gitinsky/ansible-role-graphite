@@ -22,7 +22,7 @@
 # https://github.com/brutasse/graphite-api/issues/123
 
 - name: install graphite-cyanite
-  pip: name=git+https://github.com/gitinsky/graphite-cyanite#egg=cyanite-master
+  command: pip install git+https://github.com/gitinsky/graphite-cyanite#egg=cyanite-master
   tags: pip
 
 # - name: install graphite-cyanite
