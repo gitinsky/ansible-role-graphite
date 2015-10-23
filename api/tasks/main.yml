@@ -10,20 +10,19 @@
     - libcairo2-dev
     - gcc
 
-- name: install required pips
-  pip: name={{ item }}
+# - name: install required pips
+#   pip: name={{ item }}
+#   with_items:
+#     - graphite-api
+#     - cyanite
+
+- name: install latest version of graphite-cyanite anf graphite-api
+  shell: pip install --upgrade git+https://github.com/brutasse/{{ item }}.git#egg={{ item }}
   with_items:
-    - graphite-api
-    - cyanite
-
-# install latest version of graphite-cyanite as the one in pip is still broken, see
-# https://github.com/brutasse/graphite-cyanite/issues/14
-# https://github.com/pyr/cyanite/issues/119
-# https://github.com/brutasse/graphite-api/issues/123
-
-# - name: install graphite-cyanite
-#   pip: name=git+https://github.com/brutasse/graphite-cyanite.git#egg=cyanite
-#   tags: pip
+      - graphite-cyanite
+      - graphite-api
+  notify:
+      - eye restart graphite-api
 
 - name: configure graphite-api
   template: src=graphite-api.yaml dest=/etc/graphite-api.yaml
@@ -54,6 +53,3 @@
 - name: make a site-enabled link
   file: state=link src=/etc/nginx/sites-available/graphite.conf dest=/etc/nginx/sites-enabled/graphite.conf
   notify: reload nginx
-
-
-# If you run Cyanite on multiple hosts, specify all of them to load-balance traffic

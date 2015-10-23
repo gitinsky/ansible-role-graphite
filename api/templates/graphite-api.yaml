@@ -9,7 +9,7 @@ cyanite:
 {% if hostvars[host]['cyanite_access_by_inventory_hostname_not_ip'] is defined and hostvars[host]['cyanite_access_by_inventory_hostname_not_ip'] %}
 {% set j_addr = hostvars[host]['inventory_hostname'] %}
 {% else %}
-{% set j_if = hostvars[host].cyanite_if|default(default_cyanite_if) %}
+{% set j_if = hostvars[host].cyanite_if|default( hostvars[host].ansible_default_ipv4.interface ) %}
 {% set j_addr = hostvars[host]['ansible_' + j_if]['ipv4']['address']|default('127.0.0.1') %}
 {% endif %}
   - {{ j_proto }}://{{ j_addr }}:{{ j_port }}

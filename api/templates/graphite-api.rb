@@ -5,7 +5,7 @@ Eye.application 'graphite-api' do
 
   process :'graphite-api' do
     pid_file '/var/run/graphite_api.pid'
-    start_command 'gunicorn -w2 graphite_api.app:app -b {{ graphite_api_bind_ip }}:{{ graphite_api_port }}'
+    start_command 'gunicorn -w2 graphite_api.app:app -b {{ graphite_api_bind_ip }}:{{ graphite_api_port }} --workers {{ graphite_api_workers }} --timeout {{ graphite_api_timeout }}'
 
     daemonize true
     start_timeout 10.seconds
