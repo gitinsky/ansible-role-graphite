@@ -49,6 +49,7 @@
 - name: configure graphite-api nginx
   template: src=sites-available/graphite.conf dest=/etc/nginx/sites-available/graphite.conf
   notify: nginx reload
+  tags: graphite_conf
 
 - name: make a site-enabled link
   file: state=link src=/etc/nginx/sites-available/graphite.conf dest=/etc/nginx/sites-enabled/graphite.conf
