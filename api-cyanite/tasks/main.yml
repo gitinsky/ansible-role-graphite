@@ -1,0 +1,56 @@
+# python-virtualenv
+
+- name: install dependencies
+  apt: name={{ item }}
+  with_items:
+    - python-pip
+    - python-dev
+    - libffi-dev
+    - gunicorn
+    - libcairo2-dev
+    - gcc
+
+# - name: install required pips
+#   pip: name={{ item }}
+#   with_items:
+#     - graphite-api
+#     - cyanite
+
+- name: install latest version of graphite-cyanite anf graphite-api
+  shell: pip install --upgrade git+https://github.com/brutasse/{{ item }}.git#egg={{ item }}
+  with_items:
+      - graphite-cyanite
+      - graphite-api
+  notify:
+      - eye restart graphite-api
+
+- name: configure graphite-api
+  template: src=graphite-api.yaml dest=/etc/graphite-api.yaml
+  notify:
+      - eye restart graphite-api
+  tags: gapiconf
+
+- name: create graphite index
+  file: dest={{ item.dst }} state={{ item.state }}
+  with_items:
+      - { dst: /srv/graphite, state: directory }
+      - { dst: /srv/graphite/index, state: touch }
+
+ 
+- name: put gunicorn service descriptor
+  template: src=graphite-api.rb dest=/etc/eye/graphite-api.rb owner=root group=root mode=0644
+  notify:
+      - reload eye configs
+      - eye restart graphite-api
+
+- name: load config in eye
+  command: bash -c "source /usr/local/rvm/scripts/rvm && eye l /etc/eye/apps.eye"
+
+- name: configure graphite-api nginx
+  template: src=sites-available/graphite.conf dest=/etc/nginx/sites-available/graphite.conf
+  notify: nginx reload
+  tags: graphite_conf
+
+- name: make a site-enabled link
+  file: state=link src=/etc/nginx/sites-available/graphite.conf dest=/etc/nginx/sites-enabled/graphite.conf
+  notify: reload nginx

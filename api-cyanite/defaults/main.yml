@@ -1,0 +1,11 @@
+graphite_api_http_port: 8001
+graphite_api_port: 8888
+graphite_api_bind_ip: 0.0.0.0
+cyanite_hosts_group: cyanite_hosts
+default_cyanite_api_port: 8080
+
+# graphite_api_workers: 3
+# graphite_api_timeout: 30
+
+graphite_api_workers: 150
+graphite_api_timeout: 300
