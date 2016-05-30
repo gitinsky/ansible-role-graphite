@@ -1,4 +1,4 @@
-# Gaphite
+# Graphite
 
 This role is set to work with [cyanite]().
 
