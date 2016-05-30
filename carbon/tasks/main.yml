@@ -1,3 +1,6 @@
+- name: setup whisper
+  pip: name=whisper state=present
+
 - name: setup carbon
   pip: name=carbon state=present
 
@@ -15,6 +18,9 @@
 
 - name: put carbon service descriptor
   template: src=carbon-eye.rb dest=/etc/eye/carbon.rb owner=root group=root mode=0644
+
+- name: create /opt/graphite/storage/
+  file: dest=/opt/graphite/storage/ state=directory
 
 - name: load config in eye
   command: bash -c "source /usr/local/rvm/scripts/rvm && eye l /etc/eye/apps.eye"
