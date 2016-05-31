@@ -20,10 +20,10 @@
     - graphite-web
 
 - name: configure graphite-web
-  template: src=local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py
+  template: src=local_settings.py dest={{ graphite_webapp_dir }}/local_settings.py
 
 - name: syncdb
-  shell: python ./manage.py syncdb --noinput chdir=/opt/graphite/webapp/graphite
+  shell: python ./manage.py syncdb --noinput chdir={{ graphite_webapp_dir }}
 
 - name: put gunicorn service descriptor
   template: src=gunicorn-eye.rb dest=/etc/eye/gunicorn.rb owner=root group=root mode=0644
