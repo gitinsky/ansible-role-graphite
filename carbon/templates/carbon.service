@@ -1,0 +1,13 @@
+[Unit]
+Description=Graphite-Carbon service
+
+[Service]
+Environment=GRAPHITE_ROOT=/opt/graphite
+Environment=PYTHONPATH=/usr/local/lib/python2.7/dist-packages/opt/graphite/lib
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/local/bin/carbon-cache.py --config /opt/graphite/conf/carbon.conf --debug start
+
+[Install]
+WantedBy=multi-user.target
