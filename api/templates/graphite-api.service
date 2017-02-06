@@ -1,0 +1,11 @@
+[Unit]
+Description=Graphite-API service
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/bin/gunicorn -w2 graphite_api.app:app -b {{ graphite_api_bind_ip }}:{{ graphite_api_port }} --workers {{ graphite_api_workers }} --timeout {{ graphite_api_timeout }}
+
+[Install]
+WantedBy=multi-user.target
