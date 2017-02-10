@@ -1,4 +1,9 @@
-- name: restart graphite-api
+- name: eye restart graphite-api
   command: bash -c "source /usr/local/rvm/scripts/rvm && eye restart graphite-api"
   become: yes
   become_user: "{{ eye_user }}"
+  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+
+- name: systemd restart graphite-api
+  service: name="graphite-api" state=restarted
+  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"

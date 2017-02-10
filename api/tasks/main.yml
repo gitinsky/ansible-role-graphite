@@ -13,7 +13,16 @@
   with_items:
     - graphite-api
   notify:
-      - restart graphite-api
+    - eye restart graphite-api
+  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+
+- name: install required pips
+  pip: name={{ item }}
+  with_items:
+    - graphite-api
+  notify:
+    - systemd restart graphite-api
+  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
 
 # - name: configure graphite-api
 #   template: src=graphite-api.yaml dest=/etc/graphite-api.yaml
@@ -24,16 +33,26 @@
 - name: create graphite index
   file: dest={{ item.dst }} state={{ item.state }}
   with_items:
-      - { dst: /srv/graphite, state: directory }
-      - { dst: /srv/graphite/index, state: touch }
+    - { dst: /srv/graphite, state: directory }
+    - { dst: /srv/graphite/index, state: touch }
   notify:
-      - restart graphite-api
+      - eye restart graphite-api
+  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+
+- name: create graphite index
+  file: dest={{ item.dst }} state={{ item.state }}
+  with_items:
+    - { dst: /srv/graphite, state: directory }
+    - { dst: /srv/graphite/index, state: touch }
+  notify:
+    - systemd restart graphite-api
+  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
  
 - name: put gunicorn service descriptor
   template: src=graphite-api.rb dest=/etc/eye/graphite-api.rb owner=root group=root mode=0644
   notify:
-      - reload eye configs
-      - restart graphite-api
+    - reload eye configs
+    - eye restart graphite-api
   when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
 
 - name: load config in eye
