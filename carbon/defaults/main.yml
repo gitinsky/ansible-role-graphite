@@ -1,0 +1,2 @@
+graphite_prefix: "/opt/graphite"
+graphite_retention_config_name: default
