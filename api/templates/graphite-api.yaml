@@ -1,0 +1,9 @@
+search_index: {{ graphite_prefix }}/storage/index
+finders:
+  - graphite_api.finders.whisper.WhisperFinder
+functions:
+  - graphite_api.functions.SeriesFunctions
+  - graphite_api.functions.PieFunctions
+whisper:
+  directories:
+    - {{ graphite_prefix }}/storage/whisper
