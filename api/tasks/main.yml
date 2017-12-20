@@ -14,7 +14,7 @@
     - graphite-api
   notify:
     - eye restart graphite-api
-  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+  when: "not ((ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
 
 - name: install required pips
   pip: name={{ item }}
@@ -22,47 +22,46 @@
     - graphite-api
   notify:
     - systemd restart graphite-api
-  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
+  when: "(ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
 
-# - name: configure graphite-api
-#   template: src=graphite-api.yaml dest=/etc/graphite-api.yaml
-#   notify:
-#       - eye restart graphite-api
-#   tags: gapiconf
-
-- name: create graphite index
-  file: dest={{ item.dst }} state={{ item.state }}
-  with_items:
-    - { dst: /srv/graphite, state: directory }
-    - { dst: /srv/graphite/index, state: touch }
-  notify:
-      - eye restart graphite-api
-  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
-
-- name: create graphite index
-  file: dest={{ item.dst }} state={{ item.state }}
-  with_items:
-    - { dst: /srv/graphite, state: directory }
-    - { dst: /srv/graphite/index, state: touch }
+- name: configure graphite-api
+  template: src=graphite-api.yaml dest=/etc/graphite-api.yaml
   notify:
     - systemd restart graphite-api
-  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
+
+- name: create graphite index
+  file: dest={{ item.dst }} state={{ item.state }}
+  with_items:
+    - { dst: "{{ graphite_prefix }}/storage", state: directory }
+    - { dst: "{{ graphite_prefix }}/storage/index", state: touch }
+  notify:
+      - eye restart graphite-api
+  when: "not ((ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+
+- name: create graphite index
+  file: dest={{ item.dst }} state={{ item.state }}
+  with_items:
+    - { dst: "{{ graphite_prefix }}/storage", state: directory }
+    - { dst: "{{ graphite_prefix }}/storage/index", state: touch }
+  notify:
+    - systemd restart graphite-api
+  when: "(ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
  
 - name: put gunicorn service descriptor
   template: src=graphite-api.rb dest=/etc/eye/graphite-api.rb owner=root group=root mode=0644
   notify:
     - reload eye configs
     - eye restart graphite-api
-  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+  when: "not ((ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
 
 - name: load config in eye
   command: bash -c "source /usr/local/rvm/scripts/rvm && eye l /etc/eye/apps.eye"
-  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+  when: "not ((ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
 
 - name: put systemd unit file to its destination
   template: src=graphite-api.service dest=/etc/systemd/system/graphite-api.service owner=root group=root mode=0644
-  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
+  when: "(ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
 
 - name: enable graphite-api service
   service: name=graphite-api enabled=yes state=started
-  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
+  when: "(ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"

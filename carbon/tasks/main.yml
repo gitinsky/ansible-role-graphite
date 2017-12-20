@@ -10,31 +10,32 @@
  # version=0.9.12
  # Twisted 11.1.0
   
-- name: create /opt/graphite/conf/
-  file: dest=/opt/graphite/conf/ state=directory
+- name: create {{ graphite_prefix }}/conf/
+  file: dest={{ graphite_prefix }}/conf/ state=directory
   
 - name: put carbon config
-  template: src=carbon.conf dest=/opt/graphite/conf/carbon.conf owner=root group=root mode=0644
+  template: src=carbon.conf dest={{ graphite_prefix }}/conf/carbon.conf owner=root group=root mode=0644
 
 - name: put carbon storage schemas description
-  template: src=storage-schemas.conf dest=/opt/graphite/conf/storage-schemas.conf owner=root group=root mode=0644
+  template: src=storage-schemas.conf dest={{ graphite_prefix }}/conf/storage-schemas.conf owner=root group=root mode=0644
 
 - name: put carbon service descriptor
   template: src=carbon-eye.rb dest=/etc/eye/carbon.rb owner=root group=root mode=0644
-  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+  when: "not ((ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
 
-- name: create /opt/graphite/storage/
-  file: dest=/opt/graphite/storage/ state=directory
+- name: create {{ graphite_prefix }}/storage/
+  file: dest={{ graphite_prefix }}/storage/ state=directory
 
 - name: load config in eye
   command: bash -c "source /usr/local/rvm/scripts/rvm && eye l /etc/eye/apps.eye"
   become: yes
-  when: "not ((ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
+  when: "not ((ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>'))))"
 
 - name: put systemd unit file to its destination
   template: src=carbon.service dest=/etc/systemd/system/graphite-carbon.service owner=root group=root mode=0644
-  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
+  when: "(ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
+  notify: systemctl daemon-reload
 
 - name: enable graphite-carbon service
   service: name=graphite-carbon enabled=yes state=started
-  when: "(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8') or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
+  when: "(ansible_distribution == 'Debian' and (ansible_distribution_version|version_compare(8.0, '>='))) or (ansible_distribution == 'Ubuntu' and (ansible_distribution_version|version_compare(14.04, '>')))"
